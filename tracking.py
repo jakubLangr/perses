@@ -11,6 +11,7 @@ from argparse import ArgumentParser
 
 os.environ['BETTER_EXCEPTIONS'] = "1"
 
+now_str = str(datetime.datetime.now())[:-7].replace(' ','_')
 base_py = '/home/ubuntu/anaconda3/envs/pytorch_p36/bin/python3'
 log_file = f'cli_output/train.py_{now_str}.txt'
 
@@ -31,8 +32,6 @@ if __name__ == "__main__":
     )
     FLAGS = vars(parser.parse_args())['flags']
     TESTING = vars(parser.parse_args())['testing']
-
-    now_str = str(datetime.datetime.now())[:-7].replace(' ','_')
 
     # makes sure the file above exists
     open(log_file, 'a').close()
