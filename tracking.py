@@ -6,17 +6,19 @@ import subprocess
 import sentry_sdk
 import datetime
 import os
+import config
 from sentry_sdk import capture_exception, capture_message
 from argparse import ArgumentParser
 
 os.environ['BETTER_EXCEPTIONS'] = "1"
 
 now_str = str(datetime.datetime.now())[:-7].replace(' ','_')
-base_py = '/home/ubuntu/anaconda3/envs/pytorch_p36/bin/python3'
+base_py = config.py_path
 log_file = f'cli_output/train.py_{now_str}.txt'
+shutdown_hours = [22, 23] + list(range(0,9))
 
 # This should be eventually grabbed from ENV or something.
-sentry_sdk.init("https://53a270efda1044afaea7a773d065be60@sentry.io/1528098")
+sentry_sdk.init(config.sentry_str)
 
 if __name__ == "__main__":
     usage = 'Tracks experiments by making a Sentry alert when a script finishes.'
@@ -30,16 +32,22 @@ if __name__ == "__main__":
         '--testing', type=bool, default=False,
         help='If we are testing / doing a dry run. Default: False'
     )
+    parser.add_argument(
+        '--no_shutdown', type=bool, default=False,
+        help='Shuts down the computer between in the shutdown_hours.'
+        'Set to 22-08. Default: True')
     FLAGS = vars(parser.parse_args())['flags']
     TESTING = vars(parser.parse_args())['testing']
+    NO_SHUTDOWN = vars(parser.parse_args())['no_shutdown']
 
     # makes sure the file above exists
     open(log_file, 'a').close()
 
     if TESTING:
         command = f'{base_py} buggy.py {FLAGS} 2>&1 | tee test.txt'
+        # alt command = f'{base_py} train.py {FLAGS} 2>> {log_file}'
     else:
-        command = f'{base_py} train.py {FLAGS} 2>> {log_file}'
+        command = f'{base_py} train.py {FLAGS} 2>&1 | tee {log_file}'
 
 
     try:
@@ -55,7 +63,7 @@ if __name__ == "__main__":
         capture_exception(exc)
     else:
         capture_message('Program exited, Output: \n{}\n'.format(output))
-        if datetime.datetime.now().hour in range(0,9):
+        if not NO_SHUTDOWN and datetime.datetime.now().hour in shutdown_hours:
             capture_message('It is also late. Shutting down the instance.')
             os.system('sudo shutdown now')
         
