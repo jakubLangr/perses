@@ -5,13 +5,20 @@
 Features:
 * `tracking.py` 
 * `README.md`
+* `.gitignore`
 
-###`tracking.py` is a wrapper around CLI that
+Needs: `config.py` with the following defined as string variables.
+* `py_path`: python env you want to use
+* `sentry_str`: sentry DNS string
+* `exec_file`: what file you want to run
+
+
+## `tracking.py` is a wrapper around CLI that
 * enables the user to get a sentry notification everytime a script finishes running
-* shutdown the machine between 0 and 9 am 
+* shutdown the machine between 22 pm and 8 am 
 * logs CLI output to `cli_output/` with a timestamp of the run
 	- This file is created automatically 
-* accepts two parameters: 
+* accepts parameters: 
 	- `--testing`
 	- `--flags`, which are passed to the downstream script.  
-
+	- `no_shutdown`

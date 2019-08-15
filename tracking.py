@@ -14,7 +14,7 @@ os.environ['BETTER_EXCEPTIONS'] = "1"
 
 now_str = str(datetime.datetime.now())[:-7].replace(' ','_')
 base_py = config.py_path
-log_file = f'cli_output/train.py_{now_str}.txt'
+log_file = f'cli_output/{exec_file}.py_{now_str}.txt'
 shutdown_hours = [22, 23] + list(range(0,9))
 
 # This should be eventually grabbed from ENV or something.
@@ -24,16 +24,16 @@ if __name__ == "__main__":
     usage = 'Tracks experiments by making a Sentry alert when a script finishes.'
     parser = ArgumentParser(description=usage)
     parser.add_argument(
-        '--flags', type=str, default='--parallel --batch_size 256',
+        '--flags', '-f', type=str, default='--parallel --batch_size 256',
         help='Which flags you want to pass to the underlying script.'
         'e.g. --parallel --batch_size 256'
     )
     parser.add_argument(
-        '--testing', type=bool, default=False,
+        '--testing', '-t', type=bool, default=False,
         help='If we are testing / doing a dry run. Default: False'
     )
     parser.add_argument(
-        '--no_shutdown', type=bool, default=False,
+        '--no_shutdown', '-ns', type=bool, default=False,
         help='Shuts down the computer between in the shutdown_hours.'
         'Set to 22-08. Default: True')
     FLAGS = vars(parser.parse_args())['flags']
@@ -47,8 +47,8 @@ if __name__ == "__main__":
         command = f'{base_py} buggy.py {FLAGS} 2>&1 | tee test.txt'
         # alt command = f'{base_py} train.py {FLAGS} 2>> {log_file}'
     else:
-        command = f'{base_py} train.py {FLAGS} 2>&1 | tee {log_file}'
-
+        # example
+        command = f'{base_py} {config.exec_file} {FLAGS} 2>> {log_file}'
 
     try:
         print(f'Starting tracking, running command: \n {command}')
