@@ -11,6 +11,7 @@ Needs: `config.py` with the following defined as string variables.
 * `py_path`: python env you want to use
 * `sentry_str`: sentry DNS string
 * `exec_file`: what file you want to run
+* `defaults`: what flags will be appended by default
 
 
 ## `tracking.py` is a wrapper around CLI that
