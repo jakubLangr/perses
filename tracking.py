@@ -28,12 +28,6 @@ open(log_file, 'a').close()
 # This should be eventually grabbed from ENV or something.
 # sentry_sdk.init(config.sentry_str)
 
-def log_popen_pipe(p, pipe_name):
-
-    while p.poll() is None:
-        line = getattr(p, pipe_name).readline()
-        log_file.write(line)
-
 
 if __name__ == "__main__":
     usage = 'Tracks experiments by making a Sentry alert when a script finishes.'
@@ -62,22 +56,20 @@ if __name__ == "__main__":
     else:
         # example
         command = f'{base_py} {config.exec_file} {FLAGS} 2>> {log_file}'
-        command = 'pwd'
 
-    try:
-        # import ipdb; ipdb.set_trace()
-        with sp.Popen(command, stdout=sp.PIPE, stderr=sp.PIPE, text=True) as p:
-
-            with ThreadPoolExecutor(2) as pool:
-                r1 = pool.submit(log_popen_pipe, p, 'stdout')
-                r2 = pool.submit(log_popen_pipe, p, 'stderr')
-                r1.result()
-
+     try:
+        print(f'Starting tracking, running command: \n {command}')
+        output = subprocess.check_output(
+            command, stderr=subprocess.PIPE, shell=True, timeout=3,
+            universal_newlines=True)
+            # os.system()
+            # subprocess.run(f'{base_py} buggy.py 2>&1 | tee test.txt',
+            #                 shell=True, check=True)
     except subprocess.CalledProcessError as exc:
         print("Status : FAIL", exc.returncode, exc.output)
         capture_exception(exc)
     else:
-        capture_message('Program exited, Output: \n{}\n'.format(process))
+        capture_message('Program exited, Output: \n{}\n'.format(output))
         if not NO_SHUTDOWN and datetime.datetime.now().hour in shutdown_hours:
             capture_message('It is also late. Shutting down the instance.')
             os.system('sudo shutdown now')
