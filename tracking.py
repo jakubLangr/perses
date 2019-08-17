@@ -12,15 +12,16 @@ from argparse import ArgumentParser
 import sys
 
 import subprocess as sp
-from concurrent.futures import ThreadPoolExecutor
 
-
-os.environ['BETTER_EXCEPTIONS'] = "1"
-
+# variables to set
 shutdown_hours = [22, 23] + list(range(0,9))
 now_str = str(datetime.datetime.now())[:-7].replace(' ','_')
-base_py = config.py_path
 log_file = f'cli_output/{config.exec_file}_{now_str}.txt'
+
+# uses the current python env
+os.environ['BETTER_EXCEPTIONS'] = "1"
+py_path = sp.run(['which','python'], stdout=sp.PIPE)
+base_py = py_path.stdout.decode()[:-1]
 
 # makes sure the file above exists
 open(log_file, 'a').close()
@@ -57,14 +58,15 @@ if __name__ == "__main__":
         # example
         command = f'{base_py} {config.exec_file} {FLAGS} 2>> {log_file}'
 
-     try:
+    try:
         print(f'Starting tracking, running command: \n {command}')
-        output = subprocess.check_output(
-            command, stderr=subprocess.PIPE, shell=True, timeout=3,
-            universal_newlines=True)
+        output = subprocess.run(
+            command, stderr=sp.PIPE, stdout=sp.PIPE, shell=True, timeout=3)
             # os.system()
             # subprocess.run(f'{base_py} buggy.py 2>&1 | tee test.txt',
             #                 shell=True, check=True)
+        print(output.stderr)
+        print(output.stdout)
     except subprocess.CalledProcessError as exc:
         print("Status : FAIL", exc.returncode, exc.output)
         capture_exception(exc)
