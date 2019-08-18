@@ -27,7 +27,7 @@ base_py = py_path.stdout.decode()[:-1]
 open(log_file, 'a').close()
 
 # This should be eventually grabbed from ENV or something.
-# sentry_sdk.init(config.sentry_str)
+sentry_sdk.init(config.sentry_str)
 
 
 if __name__ == "__main__":
