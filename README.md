@@ -1,6 +1,6 @@
 # Perses
 
-## Infrastructure code for Yepic
+## Helper code by `JakubLangr`
 
 Features:
 * `tracking.py` 

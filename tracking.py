@@ -13,6 +13,19 @@ import sys
 
 import subprocess as sp
 
+
+CWD = os.getcwd()
+
+if not os.path.exists(f'{CWD}/perses.config'):
+    print('Config does not exist. Please enter the commands.')
+    command = input('Enter the command to run:')
+    defaults = input("Please set defaults[Y/N]")
+    with open('config.perses',"w+") as f:
+        f.write(f"command = {command}")
+        f.write("defaults = {defaults}")
+        f.write("sentry_sdk ")
+
+
 # variables to set
 shutdown_hours = [22, 23] + list(range(0,9))
 now_str = str(datetime.datetime.now())[:-7].replace(' ','_')
