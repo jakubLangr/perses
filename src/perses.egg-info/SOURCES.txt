@@ -1,0 +1,6 @@
+README.md
+setup.py
+src/perses.egg-info/PKG-INFO
+src/perses.egg-info/SOURCES.txt
+src/perses.egg-info/dependency_links.txt
+src/perses.egg-info/top_level.txt
