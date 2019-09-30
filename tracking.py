@@ -6,7 +6,7 @@ import subprocess
 import sentry_sdk
 import datetime
 import os
-import config
+import perses_config as config
 from sentry_sdk import capture_exception, capture_message
 from argparse import ArgumentParser
 import sys
@@ -16,14 +16,15 @@ import subprocess as sp
 
 CWD = os.getcwd()
 
-if not os.path.exists(f'{CWD}/perses.config'):
+if not os.path.exists(f'{CWD}/perses_config.py'):
     print('Config does not exist. Please enter the commands.')
     command = input('Enter the command to run:')
     defaults = input("Please set defaults[Y/N]")
-    with open('config.perses',"w+") as f:
+    sentry_sdn = input("Enter the Sentry SDN")
+    with open('config_perses.py',"w+") as f:
         f.write(f"command = {command}")
         f.write("defaults = {defaults}")
-        f.write("sentry_sdk ")
+        f.write("sentry_sdn = {sentry_sdn}")
 
 
 # variables to set
