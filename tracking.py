@@ -41,7 +41,7 @@ base_py = py_path.stdout.decode()[:-1]
 open(log_file, 'a').close()
 
 # This should be eventually grabbed from ENV or something.
-sentry_sdk.init(config.sentry_str)
+sentry_sdk.init(config.sentry_sdn)
 
 
 if __name__ == "__main__":
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     NO_SHUTDOWN = vars(parser.parse_args())['no_shutdown']
 
     if TESTING:
-        command = f'{base_py} {config.exec_file} {FLAGS}'
+        command = f'{base_py} buggy.py {FLAGS}'
         # e.g. command = f'{base_py} train.py {FLAGS} 2>> {log_file}'
         # alt command = f'{base_py} train.py {FLAGS} 2>&1 | tee {log_file}'
     else:
@@ -74,14 +74,15 @@ if __name__ == "__main__":
 
     try:
         print(f'Starting tracking, running command: \n {command}')
-        output = subprocess.run(
-            command, stderr=sp.PIPE, stdout=sp.PIPE, shell=True, timeout=3)
-            # os.system()
-            # subprocess.run(f'{base_py} buggy.py 2>&1 | tee test.txt',
-            #                 shell=True, check=True)
-        print(output.stderr)
-        print(output.stdout)
-    except subprocess.CalledProcessError as exc:
+        from IPython.utils.capture import capture_output
+
+        with capture_output() as c:
+            os.system(command)
+
+        c()
+        
+        print(c.outputs, c.stdout, c.stderr)
+    except Exception as exc:
         print("Status : FAIL", exc.returncode, exc.output)
         capture_exception(exc)
     else:
